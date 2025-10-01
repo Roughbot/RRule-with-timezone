@@ -1,6 +1,6 @@
 {
   "name": "rrulelib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library for working with recurrence rules (RRULE)",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -22,7 +22,7 @@
     "scheduling",
     "typescript"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Roughbot <sathyanarayanan.pramod@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "luxon": "^3.4.0"
@@ -40,10 +40,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/rrulelib.git"
+    "url": "https://github.com/Roughbot/rrulelib.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/rrulelib/issues"
+    "url": "https://github.com/Roughbot/rrulelib/issues"
   },
-  "homepage": "https://github.com/yourusername/rrulelib#readme"
+  "homepage": "https://github.com/Roughbot/rrulelib#readme"
 }

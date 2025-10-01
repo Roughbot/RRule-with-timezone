@@ -196,11 +196,18 @@ MIT
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Buy Me a Coffee
+
+If this library helps you, consider supporting development:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-donate-yellow.svg)](https://buymeacoffee.com/hoxtheartist)
+
 ## Changelog
 
-### 1.0.0
+### 1.0.1
 
 - Initial release
 - Basic RRULE parsing and generation
+- Timezone-aware RRULE parsing and generation
 - TypeScript support
 - Comprehensive test suite
