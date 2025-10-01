@@ -196,11 +196,11 @@ MIT
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Buy Me a Coffee
+## Thank you
 
-If this library helps you, consider supporting development:
+If you'd like to say thanks, I'd really appreciate a coffee :)
 
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-donate-yellow.svg)](https://buymeacoffee.com/hoxtheartist)
+<a href="https://buymeacoffee.com/hoxtheartist" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" /></a>
 
 ## Changelog
 
