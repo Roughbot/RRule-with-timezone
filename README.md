@@ -1,6 +1,6 @@
 # RruleLib
 
-A TypeScript library for working with recurrence rules (RRULE) - perfect for calendar applications, scheduling systems, and any application that needs to handle recurring events.
+A TypeScript library for working with recurrence rules (RRULE) - perfect for calendar applications, scheduling systems, and any application that needs to handle recurring events with timezone support.
 
 ## Features
 
