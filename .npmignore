@@ -1,0 +1,29 @@
+# Source files
+src/
+tests/
+
+# Configuration files
+tsconfig.json
+jest.config.js
+.gitignore
+
+# Development dependencies
+node_modules/
+
+# Coverage reports
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.tsbuildinfo
