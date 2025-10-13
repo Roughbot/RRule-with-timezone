@@ -1,19 +1,15 @@
-/**
- * Timezone-aware RRULE functionality using Luxon
- */
-
 import { DateTime } from "luxon";
 
-// Enum for frequency types (matching your existing code)
-export enum TimezoneFrequency {
+// Enum for frequency types
+enum Frequency {
   DAILY = 0,
   WEEKLY = 1,
   MONTHLY = 2,
   YEARLY = 3,
 }
 
-// Enum for weekdays (matching your existing code)
-export enum TimezoneWeekday {
+// Enum for weekdays
+enum Weekday {
   SU = 0,
   MO = 1,
   TU = 2,
@@ -23,25 +19,29 @@ export enum TimezoneWeekday {
   SA = 6,
 }
 
-export interface TimezoneRecurrenceOptions {
-  freq: TimezoneFrequency;
+interface RecurrenceOptions {
+  freq: Frequency;
   interval: number;
   dtstart: Date;
   until?: Date;
-  wkst?: TimezoneWeekday;
-  byweekday?: TimezoneWeekday[];
+  wkst?: Weekday;
+  byweekday?: Weekday[];
   bysetpos?: number[];
   count?: number;
 }
 
-export class TimezoneRRule {
+/**
+ * This hook is used to generate the dates for a recurring event with a custom timezone
+ * @returns The dates for the recurring event
+ */
+export const useRruleDatesGenerator = () => {
   /**
-   * Parse RRULE string and convert to TimezoneRecurrenceOptions
+   * Parse RRULE string and convert to RecurrenceOptions
    */
-  public static parseRRuleString(
+  const parseRRuleString = (
     rRuleString: string,
     _startTime: string
-  ): TimezoneRecurrenceOptions | null {
+  ): RecurrenceOptions | null => {
     if (!rRuleString) return null;
 
     // Parse the DTSTART with timezone info
@@ -70,11 +70,11 @@ export class TimezoneRRule {
       { zone: "UTC" }
     );
 
-    const options: TimezoneRecurrenceOptions = {
-      freq: TimezoneFrequency.DAILY,
+    const options: RecurrenceOptions = {
+      freq: Frequency.DAILY,
       interval: 1,
       dtstart: startInTargetZone.toJSDate(),
-      wkst: TimezoneWeekday.MO,
+      wkst: Weekday.MO,
     };
 
     // Parse the RRULE part
@@ -85,16 +85,16 @@ export class TimezoneRRule {
         case "FREQ":
           switch (value) {
             case "DAILY":
-              options.freq = TimezoneFrequency.DAILY;
+              options.freq = Frequency.DAILY;
               break;
             case "WEEKLY":
-              options.freq = TimezoneFrequency.WEEKLY;
+              options.freq = Frequency.WEEKLY;
               break;
             case "MONTHLY":
-              options.freq = TimezoneFrequency.MONTHLY;
+              options.freq = Frequency.MONTHLY;
               break;
             case "YEARLY":
-              options.freq = TimezoneFrequency.YEARLY;
+              options.freq = Frequency.YEARLY;
               break;
           }
           break;
@@ -110,37 +110,43 @@ export class TimezoneRRule {
           const untilMinute = parseInt(untilStr.substring(11, 13)) || 59;
           const untilSecond = parseInt(untilStr.substring(13, 15)) || 59;
 
-          options.until = new Date(
-            untilYear,
-            untilMonth - 1,
-            untilDay,
-            untilHour,
-            untilMinute,
-            untilSecond
+          // Create the UNTIL date in UTC to avoid timezone issues
+          // This ensures consistent comparison across different timezones
+          const untilDateTime = DateTime.fromObject(
+            {
+              year: untilYear,
+              month: untilMonth,
+              day: untilDay,
+              hour: untilHour,
+              minute: untilMinute,
+              second: untilSecond,
+            },
+            { zone: "UTC" }
           );
+          options.until = untilDateTime.toJSDate();
           break;
         case "WKST":
           switch (value) {
             case "SU":
-              options.wkst = TimezoneWeekday.SU;
+              options.wkst = Weekday.SU;
               break;
             case "MO":
-              options.wkst = TimezoneWeekday.MO;
+              options.wkst = Weekday.MO;
               break;
             case "TU":
-              options.wkst = TimezoneWeekday.TU;
+              options.wkst = Weekday.TU;
               break;
             case "WE":
-              options.wkst = TimezoneWeekday.WE;
+              options.wkst = Weekday.WE;
               break;
             case "TH":
-              options.wkst = TimezoneWeekday.TH;
+              options.wkst = Weekday.TH;
               break;
             case "FR":
-              options.wkst = TimezoneWeekday.FR;
+              options.wkst = Weekday.FR;
               break;
             case "SA":
-              options.wkst = TimezoneWeekday.SA;
+              options.wkst = Weekday.SA;
               break;
           }
           break;
@@ -148,21 +154,21 @@ export class TimezoneRRule {
           options.byweekday = value.split(",").map((day) => {
             switch (day) {
               case "SU":
-                return TimezoneWeekday.SU;
+                return Weekday.SU;
               case "MO":
-                return TimezoneWeekday.MO;
+                return Weekday.MO;
               case "TU":
-                return TimezoneWeekday.TU;
+                return Weekday.TU;
               case "WE":
-                return TimezoneWeekday.WE;
+                return Weekday.WE;
               case "TH":
-                return TimezoneWeekday.TH;
+                return Weekday.TH;
               case "FR":
-                return TimezoneWeekday.FR;
+                return Weekday.FR;
               case "SA":
-                return TimezoneWeekday.SA;
+                return Weekday.SA;
               default:
-                return TimezoneWeekday.MO;
+                return Weekday.MO;
             }
           });
           break;
@@ -176,16 +182,16 @@ export class TimezoneRRule {
     });
 
     return options;
-  }
+  };
 
   /**
    * Generate dates for daily recurrence
    */
-  private static generateDailyDates(
-    options: TimezoneRecurrenceOptions,
+  const generateDailyDates = (
+    options: RecurrenceOptions,
     targetTimeZone: string,
     startTime: string
-  ): string[] {
+  ): string[] => {
     const dates: string[] = [];
     const startDate = DateTime.fromJSDate(options.dtstart);
     let currentDate = startDate;
@@ -193,7 +199,7 @@ export class TimezoneRRule {
     const maxCount = options.count || 1000; // Default limit to prevent infinite loops
 
     while (count < maxCount) {
-      if (options.until && currentDate.toJSDate() > options.until) {
+      if (options.until && currentDate.toJSDate() >= options.until) {
         break;
       }
 
@@ -214,16 +220,16 @@ export class TimezoneRRule {
     }
 
     return dates;
-  }
+  };
 
   /**
    * Generate dates for weekly recurrence
    */
-  private static generateWeeklyDates(
-    options: TimezoneRecurrenceOptions,
+  const generateWeeklyDates = (
+    options: RecurrenceOptions,
     targetTimeZone: string,
     startTime: string
-  ): string[] {
+  ): string[] => {
     const dates: string[] = [];
     const startDate = DateTime.fromJSDate(options.dtstart);
     const originalTime = DateTime.fromISO(startTime);
@@ -236,7 +242,7 @@ export class TimezoneRRule {
       const maxCount = options.count || 1000;
 
       while (count < maxCount) {
-        if (options.until && currentDate.toJSDate() > options.until) {
+        if (options.until && currentDate.toJSDate() >= options.until) {
           break;
         }
 
@@ -268,7 +274,7 @@ export class TimezoneRRule {
       const maxCount = options.count || 1000;
 
       while (count < maxCount) {
-        if (options.until && currentDate.toJSDate() > options.until) {
+        if (options.until && currentDate.toJSDate() >= options.until) {
           break;
         }
 
@@ -288,16 +294,16 @@ export class TimezoneRRule {
     }
 
     return dates;
-  }
+  };
 
   /**
    * Generate dates for monthly recurrence
    */
-  private static generateMonthlyDates(
-    options: TimezoneRecurrenceOptions,
+  const generateMonthlyDates = (
+    options: RecurrenceOptions,
     targetTimeZone: string,
     startTime: string
-  ): string[] {
+  ): string[] => {
     const dates: string[] = [];
     const startDate = DateTime.fromJSDate(options.dtstart);
     let currentDate = startDate;
@@ -305,7 +311,7 @@ export class TimezoneRRule {
     const maxCount = options.count || 1000;
 
     while (count < maxCount) {
-      if (options.until && currentDate.toJSDate() > options.until) {
+      if (options.until && currentDate.toJSDate() >= options.until) {
         break;
       }
 
@@ -369,16 +375,16 @@ export class TimezoneRRule {
     }
 
     return dates;
-  }
+  };
 
   /**
    * Generate dates for yearly recurrence
    */
-  private static generateYearlyDates(
-    options: TimezoneRecurrenceOptions,
+  const generateYearlyDates = (
+    options: RecurrenceOptions,
     targetTimeZone: string,
     startTime: string
-  ): string[] {
+  ): string[] => {
     const dates: string[] = [];
     const startDate = DateTime.fromJSDate(options.dtstart);
     let currentDate = startDate;
@@ -386,7 +392,7 @@ export class TimezoneRRule {
     const maxCount = options.count || 1000;
 
     while (count < maxCount) {
-      if (options.until && currentDate.toJSDate() > options.until) {
+      if (options.until && currentDate.toJSDate() >= options.until) {
         break;
       }
 
@@ -406,57 +412,34 @@ export class TimezoneRRule {
     }
 
     return dates;
-  }
+  };
 
   /**
    * Main function to generate dates based on recurrence options
    */
-  public static getDatesWithCustomTimezone(
+  const getDatesWithCustomTimezone = (
     rRuleString: string,
     targetTimeZone: string,
     startTime: string
-  ): string[] {
+  ) => {
     if (!rRuleString) return [];
 
-    const options = TimezoneRRule.parseRRuleString(rRuleString, startTime);
+    const options = parseRRuleString(rRuleString, startTime);
     if (!options) return [];
 
     switch (options.freq) {
-      case TimezoneFrequency.DAILY:
-        return TimezoneRRule.generateDailyDates(
-          options,
-          targetTimeZone,
-          startTime
-        );
-      case TimezoneFrequency.WEEKLY:
-        return TimezoneRRule.generateWeeklyDates(
-          options,
-          targetTimeZone,
-          startTime
-        );
-      case TimezoneFrequency.MONTHLY:
-        return TimezoneRRule.generateMonthlyDates(
-          options,
-          targetTimeZone,
-          startTime
-        );
-      case TimezoneFrequency.YEARLY:
-        return TimezoneRRule.generateYearlyDates(
-          options,
-          targetTimeZone,
-          startTime
-        );
+      case Frequency.DAILY:
+        return generateDailyDates(options, targetTimeZone, startTime);
+      case Frequency.WEEKLY:
+        return generateWeeklyDates(options, targetTimeZone, startTime);
+      case Frequency.MONTHLY:
+        return generateMonthlyDates(options, targetTimeZone, startTime);
+      case Frequency.YEARLY:
+        return generateYearlyDates(options, targetTimeZone, startTime);
       default:
         return [];
     }
-  }
-}
-
-/**
- * React hook for timezone-aware RRULE date generation
- */
-export const useRruleDatesGenerator = () => {
-  return {
-    getDatesWithCustomTimezone: TimezoneRRule.getDatesWithCustomTimezone,
   };
+
+  return { getDatesWithCustomTimezone };
 };
